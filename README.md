@@ -10,11 +10,12 @@ kam mcp
 # config 
 - Supports all startup methods.
 - Use `kamcp --help` to view help information.
+```json
 {
 ...
 "command":"kamcp",
 "args":["stdio"]
 ...
-
 }
+```
 # This is a sub-project of the kam project.
