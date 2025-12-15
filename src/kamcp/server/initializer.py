@@ -82,7 +82,7 @@ class Initializer:
                 "what is kamcp ,kamcp is kam's mcp server, kamcp --help"
                 "Tips: Use 'kam_exec' to execute a kam command.\n"
                 "Tips: Use 'kam_exec(\"--help\")' to get help.\n"
-                "Tips: Use 'kam_exec(\"--version")' to get kam version."
+                "Tips: Use 'kam_exec(\"--version\")' to get kam version."
                 "Tips: Use 'kam_exec(\"version\")' to get version.(project version.)\n"
                 "Tips: Use 'Kam_exec(tmpl list)' to list all templates.\n"
                 "Tips: Use 'Kam_exec(init --help)' to get init help.\n"
