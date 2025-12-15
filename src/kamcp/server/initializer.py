@@ -49,8 +49,8 @@ class Initializer:
 
             Args:
                 kam_command (str): The kam command to execute,
-                    such as "help".
-                    equal to "kam help".
+                    such as "--help".
+                    equal to "kam --help".
 
             Returns:
                 str: The output of the command.
