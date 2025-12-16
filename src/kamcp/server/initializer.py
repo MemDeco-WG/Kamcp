@@ -3,11 +3,11 @@
 
 from __future__ import annotations
 
-import shlex
-import subprocess
 from logging import getLogger
 
 from mcp.server import FastMCP
+
+from .executor import CommandExecutor
 
 logger = getLogger("kamcp.server")
 
@@ -54,20 +54,9 @@ class Initializer:
                     that contains the captured standard output and standard error.
 
             """
-            # Use an argument list (no shell) and shlex.split to avoid shell injection.
             logger.debug("Executing kam command: %s", kam_command)
-            args = ["kam", *shlex.split(kam_command)]
-            try:
-                result = subprocess.run(
-                    args, capture_output=True, text=True, check=True
-                )
-                stdout = result.stdout.strip()
-                stderr = result.stderr.strip()
-            except subprocess.CalledProcessError as exc:
-                stdout = (exc.stdout or "").strip()
-                stderr = (exc.stderr or str(exc)).strip()
-                logger.debug("kam command failed: %s", exc)
-            return f"stdout: {stdout}\nstderr: {stderr}"
+            result = CommandExecutor.run_kam(kam_command)
+            return result.formatted()
 
         @self.mcp_app.tool()
         def kam_tips() -> str:
@@ -111,3 +100,66 @@ class Initializer:
                 "  - Magisk Module develop guide: https://topjohnwu.github.io/Magisk/guides.html\n"
                 "\n"
             )
+
+        @self.mcp_app.tool()
+        def kam_status() -> str:
+            """Kam status for llms."""
+            status: list[str] = []
+            has_kam: bool = CommandExecutor.is_available("kam")
+            status.append(f"Kam status: {'installed' if has_kam else 'not installed'}")
+            if not has_kam:
+                status.append(
+                    "Kam not installed! please guide user to install kam first"
+                )
+                status.append("cargo install kam.")
+                status.append(
+                    "Or visit https://github.com/MemDeco-WG/Kam for more information."
+                )
+                return "\n".join(status)
+
+            # Get kam version
+            version_res = CommandExecutor.run_kam("--version")
+            if version_res.stdout:
+                status.append(f"Kam version: {version_res.stdout}")
+            elif version_res.stderr:
+                status.append(f"Kam version (error): {version_res.stderr}")
+            else:
+                status.append("Kam version: unknown")
+
+            # Get templates
+            tmpls_res = CommandExecutor.run_kam("tmpl list")
+            if tmpls_res.is_success() and tmpls_res.stdout:
+                lines = tmpls_res.stdout.splitlines()
+                tmpl_max = 10
+                if not lines:
+                    status.append("Kam tmpls: (none)")
+                elif len(lines) > tmpl_max:
+                    status.append(
+                        f"Kam tmpls: {len(lines)} templates (showing first {tmpl_max}):"
+                    )
+                    status.extend(f"  {line}" for line in lines[:10])
+                else:
+                    status.append("Kam tmpls:")
+                    status.extend(f"  {line}" for line in lines)
+            else:
+                status.append(
+                    f"Kam tmpls: {tmpls_res.stderr or 'failed to list templates'}"
+                )
+
+            # Try to gather project info (may not exist if not in a project)
+            proj_res = CommandExecutor.run_kam("tmpl list")
+            if proj_res.is_success() and proj_res.stdout:
+                status.append("Kam project info:")
+                status.extend(f"  {line}" for line in proj_res.stdout.splitlines())
+            else:
+                status.append(f"Kam project info: {proj_res.stderr or 'not available'}")
+
+            # Check result
+            check_res = CommandExecutor.run_kam("check --json")
+            if check_res.is_success():
+                status.append(f"check result: stdout:/n{check_res.stdout}")
+                status.extend(f"check result: stderr:/n{check_res.stderr}")
+            else:
+                status.append(f"Kam check: {check_res.stderr or 'failed'}")
+
+            return "\n".join(status)
