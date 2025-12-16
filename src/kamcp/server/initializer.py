@@ -6,10 +6,8 @@ from __future__ import annotations
 import shlex
 import subprocess
 from logging import getLogger
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from mcp.server import FastMCP
+from mcp.server import FastMCP
 
 logger = getLogger("kamcp.server")
 
@@ -105,6 +103,9 @@ class Initializer:
                 "     to avoid shell injection\n"
                 "\n"
                 "Useful guides\n"
+                '  - `kam_exec("-Ss <keyword>")` -> Search the modules registry for <keyword>\n'
+                '  - `kam_exec("-S <moduleId>")` -> Download the specified module\n'
+                "  - Then extract the downloaded module archive and inspect its contents to learn from it.\n"
                 "  - KernelSU Module guide: https://kernelsu.org/guide/module.html\n"
                 "  - Apatch Module guide: https://apatch.dev/apm-guide.html\n"
                 "  - Magisk Module develop guide: https://topjohnwu.github.io/Magisk/guides.html\n"
