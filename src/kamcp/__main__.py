@@ -1,6 +1,7 @@
 # Copyright (c) 2025 Memory Decoherence WG
 """CLI entry point for kamcp."""
 
+from importlib.metadata import version as get_version
 from logging import INFO, basicConfig, getLogger
 
 from click import Context, group, pass_context
@@ -16,7 +17,7 @@ logger = getLogger("kamcp")
 @group()
 @pass_context
 def kamcp(ctx: Context) -> None:
-    """Click command group."""
+    """Kamcp Click command group."""
     kam_app = FastMCP("kam_use")
     ctx.obj = {}
 
@@ -52,6 +53,13 @@ def http(ctx: Context) -> None:
     """streamable-http."""
     kam_app: FastMCP = ctx.obj["mcp_app"]
     kam_app.run(transport="streamable-http")
+
+
+@kamcp.command()
+def version() -> None:
+    """Show version."""
+    kamcp_version = get_version("kamcp")
+    logger.info(kamcp_version)
 
 
 if __name__ == "__main__":
