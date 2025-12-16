@@ -17,7 +17,7 @@ logger = getLogger("kamcp")
 @group()
 @pass_context
 def kamcp(ctx: Context) -> None:
-    """Kamcp Click command group."""
+    """Support stdio, SSE, and streamable-http modes for `kam mcp`."""
     kam_app = FastMCP("kam_use")
     ctx.obj = {}
 
