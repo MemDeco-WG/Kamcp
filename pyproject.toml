@@ -1,12 +1,11 @@
+[build-system]
+build-backend = "uv_build"
+requires = ["uv_build>=0.9.17,<0.10.0"]
+
+[dependency-groups]
+dev = ["ruff>=0.14.9"]
+
 [project]
-name = "kamcp"
-version = "0.1.5"
-description = "mcp server for kam."
-readme = "README.md"
-authors = [
-    { name = "LIghtJUNction", email = "lightjunction.me@gmail.com" }
-]
-requires-python = ">=3.12"
 dependencies = [
     "click>=8.3.1",
     "httpx>=0.28.1",
@@ -15,22 +14,19 @@ dependencies = [
     "openai-agents>=0.6.3",
     "pydantic>=2.12.5",
 ]
+description = "mcp server for kam."
+name = "kamcp"
+readme = "README.md"
+requires-python = ">=3.12"
+version = "0.1.5"
 
-[build-system]
-requires = ["uv_build>=0.9.17,<0.10.0"]
-build-backend = "uv_build"
-
-[dependency-groups]
-dev = [
-    "ruff>=0.14.9",
-]
-
-# Ruff configuration: enable all lint rules (including preview rules)
-[tool.ruff]
-[tool.ruff.lint]
-select = ["ALL"]
-preview = true
-
+[[project.authors]]
+email = "lightjunction.me@gmail.com"
+name = "LIghtJUNction"
 
 [project.scripts]
 kamcp = "kamcp.__main__:kamcp"
+
+[tool.ruff.lint]
+preview = true
+select = ["ALL"]

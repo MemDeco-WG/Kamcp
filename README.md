@@ -7,7 +7,7 @@ kam mcp
 
 - uv pip install kamcp (no x)
 
-# config 
+# config
 - Supports all startup methods.
 - Use `kamcp --help` to view help information.
 ```json
