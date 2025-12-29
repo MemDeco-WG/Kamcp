@@ -22,9 +22,12 @@ from __future__ import annotations
 import shlex
 import shutil
 import subprocess
-from collections.abc import Iterable
 from dataclasses import dataclass
 from logging import getLogger
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 logger = getLogger("kamcp.server")
 
@@ -143,17 +146,23 @@ class CommandExecutor:
             stderr = _to_str(completed.stderr)
             logger.debug("Command finished: %s (rc=%s)", args, completed.returncode)
             return CommandResult(
-                stdout=stdout, stderr=stderr, returncode=completed.returncode
+                stdout=stdout,
+                stderr=stderr,
+                returncode=completed.returncode,
             )
         except subprocess.CalledProcessError as exc:
             # CalledProcessError provides stdout/stderr when `check=True` caused this.
             stdout = str(getattr(exc, "stdout", ""))
             stderr = str(getattr(exc, "stderr", str(exc)))
             logger.debug(
-                "Command failed (CalledProcessError): %s (rc=%s)", args, exc.returncode
+                "Command failed (CalledProcessError): %s (rc=%s)",
+                args,
+                exc.returncode,
             )
             return CommandResult(
-                stdout=stdout, stderr=stderr, returncode=exc.returncode
+                stdout=stdout,
+                stderr=stderr,
+                returncode=exc.returncode,
             )
         except subprocess.TimeoutExpired as exc:
             stdout = str(getattr(exc, "stdout", ""))
@@ -163,7 +172,9 @@ class CommandExecutor:
         except Exception as exc:  # pragma: no cover - defensive
             # Any unexpected exception should not crash the caller; return a non-zero result.
             logger.exception(
-                "Unexpected error while executing command %s: %s", args, exc
+                "Unexpected error while executing command %s: %s",
+                args,
+                exc,
             )
             return CommandResult(stdout="", stderr=str(exc), returncode=1)
 
