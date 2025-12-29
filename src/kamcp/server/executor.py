@@ -25,7 +25,6 @@ import subprocess
 from collections.abc import Iterable
 from dataclasses import dataclass
 from logging import getLogger
-from multiprocessing import Lock
 
 logger = getLogger("kamcp.server")
 
