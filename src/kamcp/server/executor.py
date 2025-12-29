@@ -38,14 +38,23 @@ class CommandResult:
     returncode: int
 
     def is_success(self) -> bool:
-        """Return True if the command exited with return code 0."""
+        """If the command exited with code 0.
+
+        Returns:
+            A boolean indicating whether the command was successful.
+
+        """
         return self.returncode == 0
 
     def formatted(self) -> str:
-        """Return a compact, human-readable representation similar to the old tool.
+        r"""Return a compact, human-readable representation similar to the old tool.
 
         This matches the previous `kam_exec` tool output format used in the
         project ("stdout: ...\nstderr: ...").
+
+        Returns:
+            A string representing the formatted command result.
+
         """
         return f"stdout: {self.stdout}\nstderr: {self.stderr}"
 
@@ -59,6 +68,10 @@ class CommandExecutor:
 
         Uses `shutil.which` which is portable and avoids relying on shell
         builtins like `command -v`.
+
+        Returns:
+            A boolean indicating whether the executable is available.
+
         """
         available = shutil.which(executable) is not None
         logger.debug("Checking availability of %s: %s", executable, available)
@@ -70,6 +83,10 @@ class CommandExecutor:
 
         If `cmd` is a string it will be split with `shlex.split` to avoid
         shell interpretation and potential injection issues.
+
+        Returns:
+            A list of strings representing the command arguments.
+
         """
         if isinstance(cmd, str):
             return shlex.split(cmd)
@@ -97,7 +114,11 @@ class CommandExecutor:
             timeout: Optional timeout in seconds.
 
         The function always avoids using a shell, constructing an argv list and
-        invoking the command directly.
+        invoking the command directly
+
+        Returns:
+            CommandResult: The result of the command execution.
+
         """
         args = cls._normalize_args(cmd)
         if executable:
@@ -155,7 +176,18 @@ class CommandExecutor:
         check: bool = False,
         timeout: float | None = None,
     ) -> CommandResult:
-        """Convenience wrapper for running `kam` with the given arguments string."""
+        """Run `kam` with the given command string.
+
+        Args:
+            kam_command (str): The command to run.
+            capture_output (bool, optional): Whether to capture stdout/stderr. Defaults to True.
+            check (bool, optional): Whether to raise an exception if the command fails. Defaults to False.
+            timeout (float | None, optional): The timeout for the command. Defaults to None.
+
+        Returns:
+            CommandResult: The result of the command.
+
+        """
         return cls.run(
             kam_command,
             executable="kam",
