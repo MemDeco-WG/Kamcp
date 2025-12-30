@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import shlex
 import shutil
-import subprocess
+import subprocess  # noqa: S404
 from dataclasses import dataclass
 from logging import getLogger
 from typing import TYPE_CHECKING
@@ -129,7 +129,11 @@ class CommandExecutor:
 
         logger.debug("Executing command: %s", args)
         try:
-            completed = subprocess.run(
+            # Intentionally use subprocess.run with an argv list (no shell)
+            # and normalized args (via `_normalize_args`) to avoid shell injection.
+            # This usage is considered safe in our context; silence S603 which
+            # checks for use of untrusted input in subprocess calls.
+            completed = subprocess.run(  # noqa: S603
                 args,
                 capture_output=capture_output,
                 text=True,
@@ -171,11 +175,9 @@ class CommandExecutor:
             return CommandResult(stdout=stdout, stderr=stderr, returncode=1)
         except Exception as exc:  # pragma: no cover - defensive
             # Any unexpected exception should not crash the caller; return a non-zero result.
-            logger.exception(
-                "Unexpected error while executing command %s: %s",
-                args,
-                exc,
-            )
+            # Use logger.exception with a single message and let the logging system
+            # include exception information automatically.
+            logger.exception("Unexpected error while executing command %s", args)
             return CommandResult(stdout="", stderr=str(exc), returncode=1)
 
     @classmethod
@@ -191,9 +193,12 @@ class CommandExecutor:
 
         Args:
             kam_command (str): The command to run.
-            capture_output (bool, optional): Whether to capture stdout/stderr. Defaults to True.
-            check (bool, optional): Whether to raise an exception if the command fails. Defaults to False.
-            timeout (float | None, optional): The timeout for the command. Defaults to None.
+            capture_output (bool, optional): Whether to capture stdout/stderr.
+                Defaults to True.
+            check (bool, optional): Whether to raise an exception if the
+                command fails. Defaults to False.
+            timeout (float | None, optional): The timeout for the command.
+                Defaults to None.
 
         Returns:
             CommandResult: The result of the command.
