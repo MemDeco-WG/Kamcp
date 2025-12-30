@@ -13,23 +13,6 @@ if TYPE_CHECKING:
 
 logger = getLogger("kamcp.server")
 
-# Termux-related constants used to build adb commands. These constants help
-# construct the remote invocation for both one-shot and interactive modes.
-# Keep them near the top so any future change to the invocation is done in
-# one place.
-TERMUX_DATA_DIR = "/data/data/com.termux/files"
-TERMUX_ENV_REL = "usr/etc/termux/termux.env"
-TERMUX_LOGIN_REL = "usr/bin/login"
-TERMUX_SH_REL = "usr/bin/sh"
-# Legacy adb-shell templates and convenience wrappers removed.
-# One-shot / interactive invocations should use SSH over an adb port-forward
-# instead of raw adb-shell + su-based pipelines.
-
-
-# `is_android_host` helper moved to kamcp.server.utils
-# to avoid duplicated ad-hoc helpers.
-# Use `from .utils import is_android_host` to access the shared implementation.
-
 
 class Initializer:
     """Initialize Kamcp with the given FastMCP application."""
@@ -65,45 +48,27 @@ class Initializer:
         """Initialize tools for Kamcp."""
 
         @self.mcp_app.tool()
-        def init_basic_tools() -> str:
-            """Lazy-register basic tools (kam_exec, kam_tips, kam_status).
-
-            Returns:
-                A JSON-encoded string indicating success or failure. On success
-                the returned JSON contains ``{"ok": True, ...}``.
-
-            """
-            try:
-                # Lazy import so heavy registration logic is only loaded when the
-                # initialization command is invoked.
-                from .tools.basic import register_basic_tools  # noqa: PLC0415
-
-                register_basic_tools(self.mcp_app)
-                return json.dumps({"ok": True, "message": "basic tools registered"})
-            except Exception as e:
-                logger.exception("Failed to register basic tools")
-                return json.dumps({"ok": False, "error": str(e)})
+        def init_basic_tools() -> None:
+            """加载kam基础工具."""
+            ...
 
         @self.mcp_app.tool()
-        def init_termux_tools() -> str:
-            """Lazy-register Termux tools (one-shot/daemon/session).
+        def init_termux_tools() -> None:
+            """延迟加载全部kam termux工具.
 
-            Import and register the Termux tool group from
-            ``kamcp.server.tools.termux``. This keeps the heavy termux
-            initialization out of the module import path and supports
-            on-demand (lazy) registration.
+            执行本工具/你将获得以下能力:
+                - 连接到安卓设备的termux
+                - 在这个设备执行一些命令
 
-            Returns:
-                A JSON-encoded string indicating success or failure.
+            何时启用本工具包?
+                - 用户强调需要测试模块的时候
+
+            启用后应该怎么做?
+                - 先询问用户是否需要先clone仓库到termux的home
+                - 或者进入现有的kam项目模块仓库
+                - git pull # 如果有子模块还需要先初始化子模块
+                - 检测安卓设备是否包含kam命令
+                - 使用kam build 构建模块, 使用kam install进行安装
 
             """
-            try:
-                # Delayed import: keep heavy termux initialization out of the module
-                # import path so it is loaded only when requested.
-                from .tools import termux as termux_tools  # noqa: PLC0415
-
-                termux_tools.register_termux_tools(self.mcp_app, self)
-                return json.dumps({"ok": True, "message": "termux tools registered"})
-            except Exception as e:
-                logger.exception("Failed to register termux tools")
-                return json.dumps({"ok": False, "error": str(e)})
+            ...

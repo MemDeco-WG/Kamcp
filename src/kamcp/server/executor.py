@@ -173,8 +173,10 @@ class CommandExecutor:
             stderr = str(getattr(exc, "stderr", str(exc)))
             logger.debug("Command timed out: %s", args)
             return CommandResult(stdout=stdout, stderr=stderr, returncode=1)
-        except Exception as exc:  # pragma: no cover - defensive
-            # Any unexpected exception should not crash the caller; return a non-zero result.
+        except Exception as exc:
+            # pragma: no cover - defensive
+            # Any unexpected exception should not crash the caller;
+            # return a non-zero result.
             # Use logger.exception with a single message and let the logging system
             # include exception information automatically.
             logger.exception("Unexpected error while executing command %s", args)
