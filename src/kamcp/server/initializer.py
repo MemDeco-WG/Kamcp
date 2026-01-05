@@ -3,8 +3,7 @@
 
 from __future__ import annotations
 
-import json
-import threading
+
 from logging import getLogger
 from typing import TYPE_CHECKING
 
@@ -50,7 +49,7 @@ class Initializer:
         @self.mcp_app.tool()
         def init_basic_tools() -> None:
             """加载kam基础工具."""
-            ...
+
 
         @self.mcp_app.tool()
         def init_termux_tools() -> None:
@@ -71,4 +70,3 @@ class Initializer:
                 - 使用kam build 构建模块, 使用kam install进行安装
 
             """
-            ...
